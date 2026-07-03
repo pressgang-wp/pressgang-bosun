@@ -7,7 +7,7 @@ use PressGang\Bosun\Detect\ThemeInventory;
 /**
  * Locates guideline fragments for a theme, in three tiers:
  *
- * 1. Package-shipped: vendor/{package}/resources/boost/guidelines/**.md
+ * 1. Package-shipped: vendor/{package}/resources/bosun/guidelines/**.md
  *    (the same third-party convention Laravel Boost defined, so package
  *    authors write fragments once for any ecosystem).
  * 2. Bosun built-ins: bosun's resources/guidelines/{package-slug}/**.md,
@@ -44,7 +44,7 @@ class FragmentLocator {
 
 		// Tier 1: package-shipped fragments (feature-gated like built-ins).
 		foreach ( array_keys( $inventory->packages ) as $package ) {
-			$dir = "{$inventory->theme_dir}/vendor/{$package}/resources/boost/guidelines";
+			$dir = "{$inventory->theme_dir}/vendor/{$package}/resources/bosun/guidelines";
 
 			foreach ( $this->markdown_in( $dir ) as $relative => $path ) {
 				if ( $this->applies( $relative, $inventory ) ) {

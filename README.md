@@ -57,9 +57,11 @@ the generated output.
 Fragments are plain Markdown, mustered in three tiers (later tiers override
 earlier ones by matching relative path):
 
-1. **📦 Package-shipped** — `vendor/{package}/resources/boost/guidelines/**.md`.
-   The same third-party convention Laravel Boost defined, so package authors
-   write fragments once for any ecosystem.
+1. **📦 Package-shipped** — `vendor/{package}/resources/bosun/guidelines/**.md`.
+   The same shape as Laravel Boost's third-party convention, under Bosun's
+   own namespace — the semantics layered on top (feature gating) are
+   Bosun's, and no PressGang package will ever share a vendor directory
+   with a Laravel app.
 2. **⚓ Bosun built-ins** — `resources/guidelines/{slug}/**.md` in this
    package, covering pressgang, quartermaster, and snippets until those
    packages ship their own. Feature-gated fragments (e.g.
@@ -84,7 +86,7 @@ Malformed or oversized indexes are skipped silently.
 - **Phase 1 (you are here)** — guidelines composition; move package guidance
   in pressgang, quartermaster, and snippets into shipped fragments.
 - **Phase 2 (begun)** — skills distribution: packages ship
-  `resources/boost/skills/{name}/SKILL.md`; Bosun installs detected skills
+  `resources/bosun/skills/{name}/SKILL.md`; Bosun installs detected skills
   to `.claude/skills/` (override via `.ai/skills/{name}`). Ships the
   `pressgang-theme-build` skill — the greenfield build workflow. Next:
   absorb the b-team migration skills plugin.

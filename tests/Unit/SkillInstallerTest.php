@@ -88,9 +88,9 @@ class SkillInstallerTest extends TestCase {
 	}
 
 	public function test_frontmatter_gate_survives_crlf_line_endings(): void {
-		mkdir( "{$this->theme}/vendor/pressgang-wp/pressgang/resources/boost/skills/crlf-gated", 0755, true );
+		mkdir( "{$this->theme}/vendor/pressgang-wp/pressgang/resources/bosun/skills/crlf-gated", 0755, true );
 		file_put_contents(
-			"{$this->theme}/vendor/pressgang-wp/pressgang/resources/boost/skills/crlf-gated/SKILL.md",
+			"{$this->theme}/vendor/pressgang-wp/pressgang/resources/bosun/skills/crlf-gated/SKILL.md",
 			"---\r\nname: crlf-gated\r\nrequires-feature: legacy-v1\r\n---\r\nGated.\r\n"
 		);
 

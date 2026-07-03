@@ -9,7 +9,7 @@ use PressGang\Bosun\Detect\ThemeInventory;
  *
  * Skills are directories containing a SKILL.md (Agent Skills format) plus
  * optional supporting files. Like guidelines, they are gathered in three
- * tiers — package-shipped (`vendor/{package}/resources/boost/skills/{name}`),
+ * tiers — package-shipped (`vendor/{package}/resources/bosun/skills/{name}`),
  * bosun built-ins (`resources/skills/{name}`), theme-local
  * (`.ai/skills/{name}`) — with later tiers overriding earlier ones by skill
  * name.
@@ -44,7 +44,7 @@ class SkillInstaller {
 		$tiers = [ $this->builtins_dir ];
 
 		foreach ( array_keys( $inventory->packages ) as $package ) {
-			$tiers[] = "{$inventory->theme_dir}/vendor/{$package}/resources/boost/skills";
+			$tiers[] = "{$inventory->theme_dir}/vendor/{$package}/resources/bosun/skills";
 		}
 
 		foreach ( $tiers as $tier ) {

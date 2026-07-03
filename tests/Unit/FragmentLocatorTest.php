@@ -30,7 +30,7 @@ class FragmentLocatorTest extends TestCase {
 		// The fixture vendor ships pressgang/template-routing.md, so it
 		// overrides bosun's built-in for the same fragment id.
 		$this->assertStringContainsString(
-			'vendor/pressgang-wp/pressgang/resources/boost/guidelines/template-routing.md',
+			'vendor/pressgang-wp/pressgang/resources/bosun/guidelines/template-routing.md',
 			$fragments['pressgang/template-routing.md']
 		);
 	}

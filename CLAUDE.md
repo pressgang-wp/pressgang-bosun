@@ -18,9 +18,11 @@ WordPress boot required, so the core stays unit-testable with plain PHPUnit.
 - Fragment identity is the relative path (`{slug}/{path}.md`); later tiers
   override earlier tiers by identity. Tier order: package-shipped →
   bosun built-ins → theme-local `.ai/guidelines`.
-- Package-shipped fragments live at `resources/boost/guidelines/**` in each
-  package — Laravel Boost's third-party convention, adopted deliberately for
-  cross-ecosystem familiarity.
+- Package-shipped fragments live at `resources/bosun/guidelines/**` in each
+  package — the shape of Laravel Boost's third-party convention, under
+  Bosun's own namespace: the semantics layered on top (feature gating,
+  `requires-feature:` frontmatter) are Bosun's, not Boost's, and the two
+  ecosystems never share a vendor directory.
 - Bosun targets modern PressGang: fragments teach agents to use the
   framework's current conventions well, they are not legacy documentation.
   Conditionality comes from feature gates, not version directories.
