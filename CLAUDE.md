@@ -24,6 +24,9 @@ WordPress boot required, so the core stays unit-testable with plain PHPUnit.
 - Bosun targets modern PressGang: fragments teach agents to use the
   framework's current conventions well, they are not legacy documentation.
   Conditionality comes from feature gates, not version directories.
+- Package-shipped fragments are authoritative and evolve with their package;
+  bosun's built-ins are a frozen baseline serving installs that predate
+  shipped fragments. Improve guidance in the package, not in both places.
 - Feature-gated built-ins are included only when `ThemeInventory` detected
   the opt-in. Gate by fragment basename (see `FragmentLocator::applies()`).
 - The composed document always opens with the inventory summary: agents must

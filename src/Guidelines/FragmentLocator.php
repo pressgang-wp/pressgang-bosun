@@ -17,6 +17,9 @@ use PressGang\Bosun\Detect\ThemeInventory;
  * 3. Theme-local: {theme}/.ai/guidelines/**.md — custom additions, and
  *    overrides when the relative path matches an earlier fragment.
  *
+ * Feature-gated fragment names apply to tiers 1 and 2; theme-local
+ * fragments are never gated — writing the file is the user's opt-in.
+ *
  * Returns fragment paths keyed by their relative identity so later tiers
  * override earlier ones.
  */
@@ -39,12 +42,14 @@ class FragmentLocator {
 
 		$fragments = [];
 
-		// Tier 1: package-shipped fragments.
+		// Tier 1: package-shipped fragments (feature-gated like built-ins).
 		foreach ( array_keys( $inventory->packages ) as $package ) {
 			$dir = "{$inventory->theme_dir}/vendor/{$package}/resources/boost/guidelines";
 
 			foreach ( $this->markdown_in( $dir ) as $relative => $path ) {
-				$fragments[ static::slug( $package ) . "/{$relative}" ] = $path;
+				if ( $this->applies( $relative, $inventory ) ) {
+					$fragments[ static::slug( $package ) . "/{$relative}" ] = $path;
+				}
 			}
 		}
 

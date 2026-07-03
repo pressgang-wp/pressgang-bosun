@@ -20,7 +20,7 @@ class GuidelineComposerTest extends TestCase {
 		$this->assertStringContainsString( '<!-- bosun:fragment quartermaster/core.md -->', $document );
 		$this->assertStringContainsString( '## Shipped quartermaster fragment', $document );
 		$this->assertStringContainsString( '## Local override of pressgang core', $document );
-		$this->assertStringContainsString( 'Template routing (enabled in this theme)', $document );
+		$this->assertStringContainsString( 'Shipped routing guidance', $document );
 	}
 
 	public function test_empty_fragments_are_dropped(): void {
