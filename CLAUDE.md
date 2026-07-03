@@ -33,6 +33,10 @@ WordPress boot required, so the core stays unit-testable with plain PHPUnit.
   see versions/refs/opt-ins before conventions.
 - Generated files are disposable: regeneration is idempotent; never merge
   with hand edits (theme-local fragments are the customisation point).
+- API indexes (`vendor/{package}/docs/api-index.json`) are referenced, not
+  copied: the vendor file is the single source of truth. Skip invalid or
+  oversized indexes silently — an index is an enhancement, never a
+  requirement.
 
 ## Structure
 
@@ -40,8 +44,11 @@ WordPress boot required, so the core stays unit-testable with plain PHPUnit.
 - `src/Commands/` — thin WP-CLI command wrappers; logic stays in services.
 - `src/Detect/ThemeInventory.php` — lock + config analysis.
 - `src/Guidelines/` — FragmentLocator (tiers), GuidelineComposer (document).
+- `src/Docs/DocsIndexLocator.php` — validates package `docs/api-index.json`.
+- `src/Skills/SkillInstaller.php` — tiered skill install, gating, pruning.
 - `src/Agents/AgentTargets.php` — agent key → output file map.
 - `resources/guidelines/` — built-in fragments by package slug.
+- `resources/skills/` — built-in skills (theme-build, v1-migration).
 
 ## Adding a Fragment
 

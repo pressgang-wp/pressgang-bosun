@@ -4,6 +4,7 @@ namespace PressGang\Bosun\Commands;
 
 use PressGang\Bosun\Agents\AgentTargets;
 use PressGang\Bosun\Detect\ThemeInventory;
+use PressGang\Bosun\Docs\DocsIndexLocator;
 use PressGang\Bosun\Guidelines\FragmentLocator;
 use PressGang\Bosun\Guidelines\GuidelineComposer;
 use PressGang\Bosun\Skills\SkillInstaller;
@@ -53,7 +54,8 @@ class InstallCommand {
 
 		$locator   = new FragmentLocator( dirname( __DIR__, 2 ) . '/resources/guidelines' );
 		$fragments = $locator->locate( $inventory );
-		$document  = ( new GuidelineComposer() )->compose( $inventory, $fragments );
+		$indexes   = ( new DocsIndexLocator() )->locate( $inventory );
+		$document  = ( new GuidelineComposer() )->compose( $inventory, $fragments, $indexes );
 
 		$result = AgentTargets::write( $theme_dir, $document, $agents, isset( $assoc_args['force'] ) );
 

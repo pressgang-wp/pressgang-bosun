@@ -34,6 +34,34 @@ class GuidelineComposerTest extends TestCase {
 		$this->assertStringNotContainsString( 'bosun:fragment', $document );
 	}
 
+	public function test_api_indexes_section_points_at_vendor_json(): void {
+		$inventory = new ThemeInventory( '/tmp/x', [ 'pressgang-wp/quartermaster' => 'dev-main' ], [], [] );
+
+		$document = ( new GuidelineComposer() )->compose( $inventory, [], [
+			'pressgang-wp/quartermaster' => [
+				'path'  => 'vendor/pressgang-wp/quartermaster/docs/api-index.json',
+				'index' => [
+					'entrypoint' => 'PressGang\\Quartermaster\\Quartermaster',
+					'methods'    => [ [ 'name' => 'posts' ], [ 'name' => 'terms' ] ],
+				],
+			],
+		] );
+
+		$this->assertStringContainsString( '## API indexes', $document );
+		$this->assertStringContainsString(
+			'- pressgang-wp/quartermaster: `vendor/pressgang-wp/quartermaster/docs/api-index.json` (2 methods, entrypoint PressGang\Quartermaster\Quartermaster)',
+			$document
+		);
+	}
+
+	public function test_no_indexes_omits_the_api_section(): void {
+		$inventory = new ThemeInventory( '/tmp/x', [ 'pressgang-wp/pressgang' => 'dev-master' ], [], [] );
+
+		$document = ( new GuidelineComposer() )->compose( $inventory, [] );
+
+		$this->assertStringNotContainsString( '## API indexes', $document );
+	}
+
 	public function test_no_features_reads_as_stub_built(): void {
 		$inventory = new ThemeInventory( '/tmp/x', [ 'pressgang-wp/pressgang' => 'dev-master' ], [], [] );
 

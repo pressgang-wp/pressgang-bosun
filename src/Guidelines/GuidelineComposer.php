@@ -17,12 +17,17 @@ class GuidelineComposer {
 	 *
 	 * @param ThemeInventory        $inventory
 	 * @param array<string, string> $fragments Relative fragment id => absolute path.
+	 * @param array<string, array>  $indexes   Package => API index info, from DocsIndexLocator.
 	 *
 	 * @return string
 	 */
-	public function compose( ThemeInventory $inventory, array $fragments ): string {
+	public function compose( ThemeInventory $inventory, array $fragments, array $indexes = [] ): string {
 
 		$sections = [ $this->inventory_summary( $inventory ) ];
+
+		if ( $indexes ) {
+			$sections[] = $this->docs_indexes( $indexes );
+		}
 
 		foreach ( $fragments as $id => $path ) {
 			$content = trim( (string) file_get_contents( $path ) );
@@ -67,6 +72,45 @@ class GuidelineComposer {
 		$lines[] = $inventory->features
 			? '- ' . implode( "\n- ", $inventory->features )
 			: '- none (explicit template stubs)';
+
+		return implode( "\n", $lines );
+	}
+
+	/**
+	 * The API docs indexes section.
+	 *
+	 * Points agents at the machine-readable API indexes packages ship in
+	 * vendor, rather than inlining them — the vendor file stays the single
+	 * source of truth.
+	 *
+	 * @param array<string, array{path: string, index: array}> $indexes
+	 *
+	 * @return string
+	 */
+	protected function docs_indexes( array $indexes ): string {
+
+		$lines = [
+			'## API indexes',
+			'',
+			'These packages ship a machine-readable API index. Read the JSON',
+			'before writing code against the package — it lists every public',
+			'method with its signature and links to the relevant WordPress docs.',
+			'',
+		];
+
+		foreach ( $indexes as $package => $info ) {
+			$detail = array_filter( [
+				isset( $info['index']['methods'] ) && is_array( $info['index']['methods'] )
+					? count( $info['index']['methods'] ) . ' methods'
+					: null,
+				isset( $info['index']['entrypoint'] ) && is_string( $info['index']['entrypoint'] )
+					? "entrypoint {$info['index']['entrypoint']}"
+					: null,
+			] );
+
+			$lines[] = "- {$package}: `{$info['path']}`"
+				. ( $detail ? ' (' . implode( ', ', $detail ) . ')' : '' );
+		}
 
 		return implode( "\n", $lines );
 	}

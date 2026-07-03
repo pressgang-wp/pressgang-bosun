@@ -73,6 +73,12 @@ The composed document opens with an inventory summary — installed packages
 with lock refs, and detected opt-ins — so agents reason about the theme's
 reality, not the ecosystem's newest ideas.
 
+Packages may also ship a machine-readable API index at
+`docs/api-index.json` (method signatures, the query args they set, links
+to WordPress docs). Bosun doesn't copy it anywhere — the composed
+guidelines point agents at the vendor file, the single source of truth.
+Malformed or oversized indexes are skipped silently.
+
 ## 🗺️ Roadmap
 
 - **Phase 1 (you are here)** — guidelines composition; move package guidance
@@ -87,8 +93,11 @@ reality, not the ecosystem's newest ideas.
   `wp capstan resolve <url>` (template candidates → controller),
   `capstan config`, `capstan snippets`, `capstan context <Controller>`;
   Bosun fragments teach agents the WP-CLI/Capstan recipes.
-- **Phase 4** — local-first docs index: standardise Quartermaster's
-  `api-index.json` generator across packages and aggregate per theme.
+- **Phase 4 (begun)** — local-first docs index: packages ship a
+  machine-readable `docs/api-index.json` (Quartermaster already does);
+  Bosun surfaces each valid index in the composed guidelines so agents
+  read signatures from vendor instead of guessing. Next: standardise the
+  generator across packages.
 - **Phase 5 (if the tide demands)** — a thin MCP server proxying
   Capstan/WP-CLI.
 
