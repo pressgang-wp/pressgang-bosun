@@ -25,7 +25,13 @@ class GuidelineComposer {
 		$sections = [ $this->inventory_summary( $inventory ) ];
 
 		foreach ( $fragments as $id => $path ) {
-			$sections[] = "<!-- bosun:fragment {$id} -->\n" . trim( (string) file_get_contents( $path ) );
+			$content = trim( (string) file_get_contents( $path ) );
+
+			if ( $content === '' ) {
+				continue;
+			}
+
+			$sections[] = "<!-- bosun:fragment {$id} -->\n{$content}";
 		}
 
 		return implode( "\n\n---\n\n", $sections ) . "\n";

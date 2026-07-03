@@ -23,6 +23,17 @@ class GuidelineComposerTest extends TestCase {
 		$this->assertStringContainsString( 'Template routing (enabled in this theme)', $document );
 	}
 
+	public function test_empty_fragments_are_dropped(): void {
+		$inventory = new ThemeInventory( '/tmp/x', [ 'pressgang-wp/pressgang' => 'dev-master' ], [], [] );
+		$empty     = tempnam( sys_get_temp_dir(), 'bosun' );
+		file_put_contents( $empty, "  \n\n " );
+
+		$document = ( new GuidelineComposer() )->compose( $inventory, [ 'x/empty.md' => $empty ] );
+		unlink( $empty );
+
+		$this->assertStringNotContainsString( 'bosun:fragment', $document );
+	}
+
 	public function test_no_features_reads_as_stub_built(): void {
 		$inventory = new ThemeInventory( '/tmp/x', [ 'pressgang-wp/pressgang' => 'dev-master' ], [], [] );
 

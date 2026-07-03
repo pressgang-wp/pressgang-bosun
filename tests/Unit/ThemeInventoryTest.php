@@ -28,6 +28,12 @@ class ThemeInventoryTest extends TestCase {
 		$this->assertFalse( $inventory->has_feature( 'routes' ) );
 	}
 
+	public function test_commented_out_provider_is_not_detected(): void {
+		$inventory = ThemeInventory::from_theme( __DIR__ . '/../fixtures/commented' );
+
+		$this->assertFalse( $inventory->has_feature( 'template-routing' ) );
+	}
+
 	public function test_missing_lock_yields_empty_inventory(): void {
 		$inventory = ThemeInventory::from_theme( __DIR__ . '/../fixtures/empty' );
 

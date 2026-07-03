@@ -46,6 +46,12 @@ wp bosun update                 # recompose (idempotent) — add to composer pos
 
 That's it — all hands briefed.
 
+Bosun never clobbers a hand-written file: existing `CLAUDE.md`/`AGENTS.md`
+files without the bosun marker are skipped (pass `--force` to take them
+over). Commit the generated files — agents on machines without Bosun still
+get the briefing — and put customisations in `.ai/guidelines/`, never in
+the generated output.
+
 ## 🧩 How Fragments Are Sourced
 
 Fragments are plain Markdown, mustered in three tiers (later tiers override

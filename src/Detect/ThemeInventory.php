@@ -79,7 +79,7 @@ class ThemeInventory {
 
 		$providers = "{$theme_dir}/config/service-providers.php";
 
-		if ( is_readable( $providers ) && str_contains( (string) file_get_contents( $providers ), 'TemplateRoutingServiceProvider' ) ) {
+		if ( is_readable( $providers ) && str_contains( self::executable_code( $providers ), 'TemplateRoutingServiceProvider' ) ) {
 			$features[] = 'template-routing';
 		}
 
@@ -92,6 +92,29 @@ class ThemeInventory {
 		}
 
 		return $features;
+	}
+
+	/**
+	 * A file's PHP source with comments stripped, so commented-out lines
+	 * never trigger feature detection. Lexes only — never executes.
+	 *
+	 * @param string $file Absolute file path.
+	 *
+	 * @return string
+	 */
+	protected static function executable_code( string $file ): string {
+
+		$code = '';
+
+		foreach ( token_get_all( (string) file_get_contents( $file ) ) as $token ) {
+			if ( is_array( $token ) && in_array( $token[0], [ T_COMMENT, T_DOC_COMMENT ], true ) ) {
+				continue;
+			}
+
+			$code .= is_array( $token ) ? $token[1] : $token;
+		}
+
+		return $code;
 	}
 
 	/**
