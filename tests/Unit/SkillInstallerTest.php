@@ -54,6 +54,60 @@ class SkillInstallerTest extends TestCase {
 		$this->assertFileExists( "{$this->theme}/.claude/skills/local-skill/SKILL.md" );
 	}
 
+	public function test_feature_gated_skill_excluded_without_opt_in(): void {
+		$skills = $this->installer()->locate( $this->inventory() );
+
+		$this->assertArrayNotHasKey( 'pressgang-v1-migration', $skills );
+	}
+
+	public function test_feature_gated_skill_included_with_opt_in(): void {
+		$legacy = new ThemeInventory( $this->theme, [ 'pressgang-wp/pressgang' => 'dev-master' ], [], [ 'legacy-v1' ] );
+
+		$skills = $this->installer()->locate( $legacy );
+
+		$this->assertArrayHasKey( 'pressgang-v1-migration', $skills );
+	}
+
+	public function test_prunes_stale_managed_skills_but_never_hand_installed_ones(): void {
+		$installer = $this->installer();
+
+		// First run on a legacy theme installs the migration skill.
+		$legacy = new ThemeInventory( $this->theme, [ 'pressgang-wp/pressgang' => 'dev-master' ], [], [ 'legacy-v1' ] );
+		$installer->install( $this->theme, $installer->locate( $legacy ) );
+		$this->assertFileExists( "{$this->theme}/.claude/skills/pressgang-v1-migration/SKILL.md" );
+
+		// A hand-installed skill bosun knows nothing about.
+		mkdir( "{$this->theme}/.claude/skills/hand-made", 0755, true );
+		file_put_contents( "{$this->theme}/.claude/skills/hand-made/SKILL.md", 'mine' );
+
+		// Second run after migration: legacy feature gone.
+		$installer->install( $this->theme, $installer->locate( $this->inventory() ) );
+
+		$this->assertFileDoesNotExist( "{$this->theme}/.claude/skills/pressgang-v1-migration/SKILL.md" );
+		$this->assertFileExists( "{$this->theme}/.claude/skills/hand-made/SKILL.md" );
+	}
+
+	public function test_frontmatter_gate_survives_crlf_line_endings(): void {
+		mkdir( "{$this->theme}/vendor/pressgang-wp/pressgang/resources/boost/skills/crlf-gated", 0755, true );
+		file_put_contents(
+			"{$this->theme}/vendor/pressgang-wp/pressgang/resources/boost/skills/crlf-gated/SKILL.md",
+			"---\r\nname: crlf-gated\r\nrequires-feature: legacy-v1\r\n---\r\nGated.\r\n"
+		);
+
+		$this->assertArrayNotHasKey( 'crlf-gated', $this->installer()->locate( $this->inventory() ) );
+	}
+
+	public function test_reinstall_replaces_rather_than_overlays(): void {
+		$installer = $this->installer();
+
+		$installer->install( $this->theme, $installer->locate( $this->inventory() ) );
+		file_put_contents( "{$this->theme}/.claude/skills/local-skill/removed-from-source.md", 'stale' );
+
+		$installer->install( $this->theme, $installer->locate( $this->inventory() ) );
+
+		$this->assertFileDoesNotExist( "{$this->theme}/.claude/skills/local-skill/removed-from-source.md" );
+	}
+
 	public function test_directories_without_skill_md_are_ignored(): void {
 		mkdir( "{$this->theme}/.ai/skills/not-a-skill", 0755, true );
 		file_put_contents( "{$this->theme}/.ai/skills/not-a-skill/notes.txt", 'x' );

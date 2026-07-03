@@ -29,6 +29,10 @@ class SkillInstaller {
 	/**
 	 * Locates the skills applicable to a theme inventory.
 	 *
+	 * Built-in and package-shipped skills may declare a required feature in
+	 * their SKILL.md frontmatter (`requires-feature: legacy-v1`) and are
+	 * skipped when the theme lacks it. Theme-local skills are never gated.
+	 *
 	 * @param ThemeInventory $inventory
 	 *
 	 * @return array<string, string> Skill name => source directory.
@@ -43,17 +47,58 @@ class SkillInstaller {
 			$tiers[] = "{$inventory->theme_dir}/vendor/{$package}/resources/boost/skills";
 		}
 
-		$tiers[] = "{$inventory->theme_dir}/.ai/skills";
-
 		foreach ( $tiers as $tier ) {
 			foreach ( $this->skills_in( $tier ) as $name => $dir ) {
-				$skills[ $name ] = $dir;
+				if ( $this->applies( $dir, $inventory ) ) {
+					$skills[ $name ] = $dir;
+				}
 			}
+		}
+
+		foreach ( $this->skills_in( "{$inventory->theme_dir}/.ai/skills" ) as $name => $dir ) {
+			$skills[ $name ] = $dir;
 		}
 
 		ksort( $skills );
 
 		return $skills;
+	}
+
+	/**
+	 * Whether a skill's frontmatter feature requirement is satisfied.
+	 *
+	 * @param string         $dir       Skill directory.
+	 * @param ThemeInventory $inventory
+	 *
+	 * @return bool
+	 */
+	protected function applies( string $dir, ThemeInventory $inventory ): bool {
+
+		$frontmatter = $this->frontmatter( "{$dir}/SKILL.md" );
+
+		if ( ! preg_match( '/^requires-feature:\s*(\S+)\s*$/m', $frontmatter, $match ) ) {
+			return true;
+		}
+
+		return $inventory->has_feature( $match[1] );
+	}
+
+	/**
+	 * A SKILL.md file's YAML frontmatter block, or an empty string.
+	 *
+	 * @param string $file Absolute path to a SKILL.md.
+	 *
+	 * @return string
+	 */
+	protected function frontmatter( string $file ): string {
+
+		$content = (string) file_get_contents( $file );
+
+		if ( preg_match( '/^---\r?\n(.*?)\r?\n---/s', $content, $match ) ) {
+			return $match[1];
+		}
+
+		return '';
 	}
 
 	/**
@@ -66,17 +111,89 @@ class SkillInstaller {
 	 */
 	public function install( string $theme_dir, array $skills ): array {
 
+		if ( ! is_dir( "{$theme_dir}/.claude/skills" ) ) {
+			mkdir( "{$theme_dir}/.claude/skills", 0755, true );
+		}
+
+		$this->prune( $theme_dir, array_keys( $skills ) );
+
 		$installed = [];
 
 		foreach ( $skills as $name => $source ) {
 			$target = "{$theme_dir}/.claude/skills/{$name}";
+
+			// Replace rather than overlay, so files removed from the source
+			// don't linger in the installed copy.
+			if ( is_dir( $target ) ) {
+				$this->remove_dir( $target );
+			}
 
 			$this->copy_dir( $source, $target );
 
 			$installed[] = $name;
 		}
 
+		file_put_contents(
+			"{$theme_dir}/.claude/skills/.bosun-skills.json",
+			json_encode( $installed, JSON_PRETTY_PRINT ) . "\n"
+		);
+
 		return $installed;
+	}
+
+	/**
+	 * Removes previously bosun-managed skills that no longer apply (e.g. a
+	 * migration skill after the theme has been migrated). Only skills listed
+	 * in the bosun manifest are ever removed — hand-installed skills are
+	 * never touched.
+	 *
+	 * @param string             $theme_dir Absolute path to the child theme.
+	 * @param array<int, string> $current   Skill names about to be installed.
+	 *
+	 * @return void
+	 */
+	protected function prune( string $theme_dir, array $current ): void {
+
+		$manifest = "{$theme_dir}/.claude/skills/.bosun-skills.json";
+
+		if ( ! is_readable( $manifest ) ) {
+			return;
+		}
+
+		$managed = json_decode( (string) file_get_contents( $manifest ), true );
+
+		if ( ! is_array( $managed ) ) {
+			return;
+		}
+
+		foreach ( array_diff( $managed, $current ) as $stale ) {
+			$dir = "{$theme_dir}/.claude/skills/" . basename( (string) $stale );
+
+			if ( is_dir( $dir ) ) {
+				$this->remove_dir( $dir );
+			}
+		}
+	}
+
+	/**
+	 * Recursively removes a directory.
+	 *
+	 * @param string $dir
+	 *
+	 * @return void
+	 */
+	protected function remove_dir( string $dir ): void {
+
+		$iterator = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator( $dir, \FilesystemIterator::SKIP_DOTS ),
+			\RecursiveIteratorIterator::CHILD_FIRST
+		);
+
+		foreach ( $iterator as $item ) {
+			$item->isDir() ? rmdir( $item->getPathname() ) : unlink( $item->getPathname() );
+		}
+
+		rmdir( $dir );
 	}
 
 	/**

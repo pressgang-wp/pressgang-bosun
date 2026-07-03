@@ -91,6 +91,11 @@ class ThemeInventory {
 			$features[] = 'routes';
 		}
 
+		// A PressGang v1 boot file marks a theme awaiting migration.
+		if ( is_readable( "{$theme_dir}/core/settings.php" ) ) {
+			$features[] = 'legacy-v1';
+		}
+
 		return $features;
 	}
 
