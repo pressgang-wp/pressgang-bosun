@@ -77,9 +77,11 @@ reality, not the ecosystem's newest ideas.
 
 - **Phase 1 (you are here)** — guidelines composition; move package guidance
   in pressgang, quartermaster, and snippets into shipped fragments.
-- **Phase 2** — skills distribution: packages ship
-  `resources/boost/skills/{name}/SKILL.md`; Bosun installs them per detected
-  package (absorbing the b-team migration skills plugin).
+- **Phase 2 (begun)** — skills distribution: packages ship
+  `resources/boost/skills/{name}/SKILL.md`; Bosun installs detected skills
+  to `.claude/skills/` (override via `.ai/skills/{name}`). Ships the
+  `pressgang-theme-build` skill — the greenfield build workflow. Next:
+  absorb the b-team migration skills plugin.
 - **Phase 3** — introspection commands in
   [Capstan](https://github.com/pressgang-wp/pressgang-capstan):
   `wp capstan resolve <url>` (template candidates → controller),
