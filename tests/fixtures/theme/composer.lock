@@ -1,0 +1,25 @@
+{
+    "packages": [
+        {
+            "name": "pressgang-wp/pressgang",
+            "version": "dev-master",
+            "source": { "reference": "d2214567890abcdef" }
+        },
+        {
+            "name": "pressgang-wp/quartermaster",
+            "version": "dev-main",
+            "source": { "reference": "e68b8181234567890" }
+        },
+        {
+            "name": "timber/timber",
+            "version": "2.5.1",
+            "source": { "reference": "abcdef1234567890" }
+        },
+        {
+            "name": "twig/twig",
+            "version": "v3.27.1",
+            "source": { "reference": "1111111" }
+        }
+    ],
+    "packages-dev": []
+}

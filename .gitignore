@@ -1,0 +1,5 @@
+vendor/
+.phpunit.result.cache
+.claude/
+*.bak
+.DS_Store
