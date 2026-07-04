@@ -52,7 +52,8 @@ class GuidelineComposer {
 	protected function inventory_summary( ThemeInventory $inventory ): string {
 
 		$lines = [
-			'# ' . basename( $inventory->theme_dir ) . ' — theme guidelines (composed by pressgang-bosun)',
+			// Realpath first so a relative --theme=. still names the theme.
+			'# ' . basename( (string) ( realpath( $inventory->theme_dir ) ?: $inventory->theme_dir ) ) . ' — theme guidelines (composed by pressgang-bosun)',
 			'',
 			'Generated from this theme\'s installed packages and configuration.',
 			'Regenerate with `wp bosun update` — do not edit this region by hand.',
