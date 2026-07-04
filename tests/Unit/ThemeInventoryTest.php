@@ -40,4 +40,35 @@ class ThemeInventoryTest extends TestCase {
 		$this->assertSame( [], $inventory->packages );
 		$this->assertSame( [], $inventory->features );
 	}
+
+	public function test_package_dir_defaults_to_vendor(): void {
+		$inventory = new ThemeInventory( '/theme', [ 'pressgang-wp/quartermaster' => 'dev-main' ], [], [] );
+
+		$this->assertSame( '/theme/vendor/pressgang-wp/quartermaster', $inventory->package_dir( 'pressgang-wp/quartermaster' ) );
+	}
+
+	public function test_resolves_install_paths_outside_vendor_from_installed_json(): void {
+		$root = sys_get_temp_dir() . '/bosun-inv-test-' . uniqid();
+		mkdir( "{$root}/themes/child/vendor/composer", 0755, true );
+		mkdir( "{$root}/themes/pressgang", 0755, true );
+
+		// The parent theme installs beside the child via installer-paths.
+		file_put_contents( "{$root}/themes/child/composer.lock", json_encode( [
+			'packages' => [
+				[ 'name' => 'pressgang-wp/pressgang', 'version' => 'dev-master' ],
+			],
+		] ) );
+		file_put_contents( "{$root}/themes/child/vendor/composer/installed.json", json_encode( [
+			'packages' => [
+				[ 'name' => 'pressgang-wp/pressgang', 'install-path' => '../../../pressgang' ],
+			],
+		] ) );
+
+		$inventory = ThemeInventory::from_theme( "{$root}/themes/child" );
+		$resolved  = $inventory->package_dir( 'pressgang-wp/pressgang' );
+
+		exec( 'rm -rf ' . escapeshellarg( $root ) );
+
+		$this->assertSame( realpath( sys_get_temp_dir() ) . '/' . basename( $root ) . '/themes/pressgang', $resolved );
+	}
 }

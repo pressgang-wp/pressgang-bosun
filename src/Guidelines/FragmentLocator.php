@@ -44,7 +44,7 @@ class FragmentLocator {
 
 		// Tier 1: package-shipped fragments (feature-gated like built-ins).
 		foreach ( array_keys( $inventory->packages ) as $package ) {
-			$dir = "{$inventory->theme_dir}/vendor/{$package}/resources/bosun/guidelines";
+			$dir = $inventory->package_dir( $package ) . '/resources/bosun/guidelines';
 
 			foreach ( $this->markdown_in( $dir ) as $relative => $path ) {
 				if ( $this->applies( $relative, $inventory ) ) {

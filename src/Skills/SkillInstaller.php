@@ -44,7 +44,7 @@ class SkillInstaller {
 		$tiers = [ $this->builtins_dir ];
 
 		foreach ( array_keys( $inventory->packages ) as $package ) {
-			$tiers[] = "{$inventory->theme_dir}/vendor/{$package}/resources/bosun/skills";
+			$tiers[] = $inventory->package_dir( $package ) . '/resources/bosun/skills';
 		}
 
 		foreach ( $tiers as $tier ) {

@@ -73,6 +73,27 @@ class DocsIndexLocatorTest extends TestCase {
 		$this->assertSame( [], $indexes );
 	}
 
+	public function test_index_outside_vendor_gets_a_portable_relative_path(): void {
+		mkdir( "{$this->theme}-parent/docs", 0755, true );
+		file_put_contents( "{$this->theme}-parent/docs/api-index.json", json_encode( [ 'methods' => [] ] ) );
+
+		$inventory = new ThemeInventory(
+			$this->theme,
+			[ 'pressgang-wp/pressgang' => 'dev-master' ],
+			[],
+			[],
+			[ 'pressgang-wp/pressgang' => "{$this->theme}-parent" ]
+		);
+
+		$indexes = ( new DocsIndexLocator() )->locate( $inventory );
+		exec( 'rm -rf ' . escapeshellarg( "{$this->theme}-parent" ) );
+
+		$this->assertSame(
+			'../' . basename( "{$this->theme}-parent" ) . '/docs/api-index.json',
+			$indexes['pressgang-wp/pressgang']['path']
+		);
+	}
+
 	public function test_oversized_index_is_skipped(): void {
 		$this->ship_index(
 			'pressgang-wp/quartermaster',

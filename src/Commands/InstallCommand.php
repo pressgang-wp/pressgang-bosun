@@ -48,7 +48,9 @@ class InstallCommand {
 
 		$inventory = ThemeInventory::from_theme( $theme_dir );
 
-		if ( empty( $inventory->packages ) ) {
+		// A v1 theme legitimately has no composer packages — bosun still has
+		// work to do there (the migration skill).
+		if ( empty( $inventory->packages ) && ! $inventory->has_feature( 'legacy-v1' ) ) {
 			\WP_CLI::error( "No pressgang packages found in {$theme_dir}/composer.lock — is this a PressGang child theme?" );
 		}
 

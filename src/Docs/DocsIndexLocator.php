@@ -35,8 +35,7 @@ class DocsIndexLocator {
 		$indexes = [];
 
 		foreach ( array_keys( $inventory->packages ) as $package ) {
-			$relative = "vendor/{$package}/docs/api-index.json";
-			$file     = "{$inventory->theme_dir}/{$relative}";
+			$file = $inventory->package_dir( $package ) . '/docs/api-index.json';
 
 			if ( ! is_file( $file ) || filesize( $file ) > static::MAX_BYTES ) {
 				continue;
@@ -49,7 +48,7 @@ class DocsIndexLocator {
 			}
 
 			$indexes[ $package ] = [
-				'path'  => $relative,
+				'path'  => static::relative_path( $inventory->theme_dir, $file ),
 				'index' => $index,
 			];
 		}
@@ -57,5 +56,30 @@ class DocsIndexLocator {
 		ksort( $indexes );
 
 		return $indexes;
+	}
+
+	/**
+	 * A file's path relative to a base directory, using ../ when the file
+	 * lives outside it (e.g. the parent theme installed beside the child).
+	 * Keeps composed guidelines machine-portable — never absolute.
+	 *
+	 * @param string $base Absolute base directory.
+	 * @param string $file Absolute file path.
+	 *
+	 * @return string
+	 */
+	protected static function relative_path( string $base, string $file ): string {
+
+		// Realpath both sides so symlinked segments (e.g. macOS /var →
+		// /private/var) can't defeat the common-prefix match.
+		$base = explode( '/', trim( (string) realpath( $base ), '/' ) );
+		$file = explode( '/', trim( (string) ( realpath( $file ) ?: $file ), '/' ) );
+
+		while ( $base && $file && $base[0] === $file[0] ) {
+			array_shift( $base );
+			array_shift( $file );
+		}
+
+		return str_repeat( '../', count( $base ) ) . implode( '/', $file );
 	}
 }

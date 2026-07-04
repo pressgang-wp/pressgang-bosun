@@ -13,17 +13,37 @@ namespace PressGang\Bosun\Detect;
 class ThemeInventory {
 
 	/**
-	 * @param string                $theme_dir Absolute path to the child theme.
-	 * @param array<string, string> $packages  Package name => version (pressgang-wp/* and notable others).
-	 * @param array<string, string> $refs      Package name => short source reference.
-	 * @param array<int, string>    $features  Detected feature opt-ins (e.g. 'template-routing').
+	 * @param string                $theme_dir    Absolute path to the child theme.
+	 * @param array<string, string> $packages     Package name => version (pressgang-wp/* and notable others).
+	 * @param array<string, string> $refs         Package name => short source reference.
+	 * @param array<int, string>    $features     Detected feature opt-ins (e.g. 'template-routing').
+	 * @param array<string, string> $package_dirs Package name => resolved install directory, where
+	 *                                            it differs from the vendor/{name} default.
 	 */
 	public function __construct(
 		public readonly string $theme_dir,
 		public readonly array $packages,
 		public readonly array $refs,
 		public readonly array $features,
+		public readonly array $package_dirs = [],
 	) {
+	}
+
+	/**
+	 * A package's install directory.
+	 *
+	 * Composer's installer-paths can place packages outside vendor — the
+	 * pressgang parent theme (type wordpress-theme) installs to
+	 * wp-content/themes/pressgang. Paths resolved from
+	 * vendor/composer/installed.json take precedence; anything else falls
+	 * back to the vendor/{name} default.
+	 *
+	 * @param string $name Package name.
+	 *
+	 * @return string
+	 */
+	public function package_dir( string $name ): string {
+		return $this->package_dirs[ $name ] ?? "{$this->theme_dir}/vendor/{$name}";
 	}
 
 	/**
@@ -51,7 +71,51 @@ class ThemeInventory {
 			}
 		}
 
-		return new self( $theme_dir, $packages, $refs, self::detect_features( $theme_dir ) );
+		return new self(
+			$theme_dir,
+			$packages,
+			$refs,
+			self::detect_features( $theme_dir ),
+			self::installed_package_dirs( $theme_dir, array_keys( $packages ) )
+		);
+	}
+
+	/**
+	 * Resolves notable packages' install directories from Composer's
+	 * vendor/composer/installed.json, which records the true install-path
+	 * even when installer-paths place a package outside vendor.
+	 *
+	 * @param string             $theme_dir Absolute path to the child theme.
+	 * @param array<int, string> $notable   Package names to resolve.
+	 *
+	 * @return array<string, string> Package name => resolved directory.
+	 */
+	protected static function installed_package_dirs( string $theme_dir, array $notable ): array {
+
+		$file = "{$theme_dir}/vendor/composer/installed.json";
+
+		if ( ! is_readable( $file ) ) {
+			return [];
+		}
+
+		$installed = json_decode( (string) file_get_contents( $file ), true );
+		$dirs      = [];
+
+		foreach ( $installed['packages'] ?? [] as $package ) {
+			$name = $package['name'] ?? '';
+
+			if ( ! in_array( $name, $notable, true ) || empty( $package['install-path'] ) ) {
+				continue;
+			}
+
+			$resolved = realpath( "{$theme_dir}/vendor/composer/{$package['install-path']}" );
+
+			if ( $resolved !== false ) {
+				$dirs[ $name ] = $resolved;
+			}
+		}
+
+		return $dirs;
 	}
 
 	/**
