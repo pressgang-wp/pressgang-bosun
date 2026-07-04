@@ -94,11 +94,11 @@ Malformed or oversized indexes are skipped silently.
   to `.claude/skills/` (override via `.ai/skills/{name}`). Ships the
   `pressgang-theme-build` skill — the greenfield build workflow. Next:
   absorb the b-team migration skills plugin.
-- **Phase 3** — introspection commands in
-  [Capstan](https://github.com/pressgang-wp/pressgang-capstan):
-  `wp capstan resolve <url>` (template candidates → controller),
-  `capstan config`, `capstan snippets`, `capstan context <Controller>`;
-  Bosun fragments teach agents the WP-CLI/Capstan recipes.
+- **Phase 3** — fragments that teach agents the WP-CLI/Capstan
+  introspection recipes, once
+  [Capstan](https://github.com/pressgang-wp/pressgang-capstan#roadmap)
+  ships its planned introspection commands (`resolve`, `config dump`,
+  `snippets`, `context`) — Capstan's roadmap owns that command list.
 - **Phase 4 (begun)** — local-first docs index: packages ship a
   machine-readable `docs/api-index.json` (Quartermaster already does);
   Bosun surfaces each valid index in the composed guidelines so agents
