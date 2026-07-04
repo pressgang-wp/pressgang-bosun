@@ -46,11 +46,15 @@ wp bosun update                 # recompose (idempotent) — add to composer pos
 
 That's it — all hands briefed.
 
-Bosun never clobbers a hand-written file: existing `CLAUDE.md`/`AGENTS.md`
-files without the bosun marker are skipped (pass `--force` to take them
-over). Commit the generated files — agents on machines without Bosun still
-get the briefing — and put customisations in `.ai/guidelines/`, never in
-the generated output.
+Bosun owns a marked region inside each file — everything between
+`<!-- bosun:start -->` and `<!-- bosun:end -->` — never the whole file.
+A hand-written `CLAUDE.md`/`AGENTS.md` keeps every byte of its content
+and gains the region appended at the end; re-runs replace the region in
+place. The only file Bosun refuses to touch is one whose markers are
+unbalanced or duplicated (fix them by hand, or pass `--force` to rewrite
+the file as region-only). Commit the generated files — agents on machines
+without Bosun still get the briefing — and put customisations in
+`.ai/guidelines/` or outside the region, never inside it.
 
 ## 🧩 How Fragments Are Sourced
 

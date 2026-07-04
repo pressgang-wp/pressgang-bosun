@@ -33,8 +33,11 @@ WordPress boot required, so the core stays unit-testable with plain PHPUnit.
   the opt-in. Gate by fragment basename (see `FragmentLocator::applies()`).
 - The composed document always opens with the inventory summary: agents must
   see versions/refs/opt-ins before conventions.
-- Generated files are disposable: regeneration is idempotent; never merge
-  with hand edits (theme-local fragments are the customisation point).
+- Bosun owns a marked region (`<!-- bosun:start -->`/`<!-- bosun:end -->`)
+  inside agent files, never the whole file: hand-written content outside the
+  region is preserved byte-for-byte, the region is replaced idempotently on
+  every run, and files with unbalanced or duplicated markers are skipped
+  (never guessed at) without --force.
 - API indexes (`vendor/{package}/docs/api-index.json`) are referenced, not
   copied: the vendor file is the single source of truth. Skip invalid or
   oversized indexes silently — an index is an enhancement, never a

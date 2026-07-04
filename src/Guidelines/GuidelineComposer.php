@@ -52,10 +52,10 @@ class GuidelineComposer {
 	protected function inventory_summary( ThemeInventory $inventory ): string {
 
 		$lines = [
-			'# Theme Guidelines (composed by pressgang-bosun)',
+			'# ' . basename( $inventory->theme_dir ) . ' — theme guidelines (composed by pressgang-bosun)',
 			'',
 			'Generated from this theme\'s installed packages and configuration.',
-			'Regenerate with `wp bosun update` — do not edit by hand.',
+			'Regenerate with `wp bosun update` — do not edit this region by hand.',
 			'',
 			'## Installed',
 			'',
