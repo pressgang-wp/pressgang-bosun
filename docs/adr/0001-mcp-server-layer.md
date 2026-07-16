@@ -1,6 +1,6 @@
 # ADR 0001: An MCP server is the missing layer, owned by Capstan and wired by Bosun
 
-- Status: Accepted
+- Status: Accepted — largely implemented (2026-07-16)
 - Date: 2026-07-16
 
 ## Context
@@ -138,6 +138,30 @@ the write tools stay gated behind explicit opt-in.
 - **New surface to maintain.** An MCP server is a support surface (protocol
   versions, editor quirks). Mitigated by keeping every tool a thin proxy with no
   logic of its own, and by shipping read-only tools first.
+
+## Implementation status
+
+Shipped:
+
+- `wp capstan mcp serve` — the stdio JSON-RPC server, with read tools proxying
+  `resolve`, `matrix`, `doctor`, `config`, `snippets`, `context`, `about`
+  (`context`/`about` gained `--format=json`).
+- `pressgang_docs_search` over the api-index corpus, version-matched from vendor.
+- `pressgang_logs` over the WordPress debug log (the observer-backed source
+  remains a later enhancement).
+- `pressgang_make` — bounded, preview-first scaffolding, gated behind
+  `--allow-write`.
+- Bosun writes the registration (`.mcp.json`, `.cursor/mcp.json`) on `install`,
+  gated on a Capstan that can serve MCP.
+- One standard api-index generator (`wp capstan make api-index`); Quartermaster
+  and Muster adopted it.
+
+Deferred:
+
+- `pressgang_eval` (arbitrary PHP) — an RCE surface; awaits explicit owner
+  sign-off before it is registered.
+- The observer-backed `pressgang_logs` source (Shakedown signals).
+- Multi-agent skill targeting (Bosun Phase 2).
 
 ## Not chosen
 

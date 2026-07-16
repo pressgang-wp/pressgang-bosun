@@ -107,19 +107,19 @@ Malformed or oversized indexes are skipped silently.
   introspection commands (`resolve`, `context --add`, `config dump`,
   `snippets`, `doctor`) and pressgang's shipped fragments now teach agents
   to verify with them instead of inferring from source.
-- **Phase 4 (begun)** — local-first docs index: packages ship a
-  machine-readable `docs/api-index.json` (Quartermaster already does);
-  Bosun surfaces each valid index in the composed guidelines so agents
-  read signatures from vendor instead of guessing. Next: standardise the
-  generator across packages.
-- **Phase 5 (promoted — the missing layer)** — a thin MCP server:
-  Capstan ships `wp capstan mcp serve` (proxying its introspection, plus
-  a version-aware docs search over the api-indexes and a logs tool over
-  Shakedown's observer); Bosun writes the registration into each agent
-  target. This is what brings PressGang to parity-and-beyond with Laravel
-  Boost, and unlocks non-Bash editors (Cursor, Windsurf). It is a wiring
-  job over shipped components — see
-  [ADR 0001](docs/adr/0001-mcp-server-layer.md).
+- **Phase 4 (done)** — local-first docs index: packages ship a
+  machine-readable `docs/api-index.json`, surfaced in the composed guidelines
+  so agents read signatures from vendor instead of guessing. Capstan now ships
+  one standard generator (`wp capstan make api-index`, from a per-package
+  `api-index.php` manifest); Quartermaster and Muster are on it.
+- **Phase 5 (largely shipped — the missing layer)** — a thin MCP server.
+  Capstan ships `wp capstan mcp serve` proxying its introspection, a
+  version-aware `pressgang_docs_search` over the api-indexes, and
+  `pressgang_logs`; Bosun writes the registration into each agent target
+  (`.mcp.json`, `.cursor/mcp.json`) on `install`. This brings PressGang to
+  parity-and-beyond with Laravel Boost and unlocks non-Bash editors (Cursor,
+  Windsurf). Remaining: the observer-backed logs source and the (owner-gated)
+  `pressgang_eval` write tool. See [ADR 0001](docs/adr/0001-mcp-server-layer.md).
 
 ## 🧪 Testing
 
