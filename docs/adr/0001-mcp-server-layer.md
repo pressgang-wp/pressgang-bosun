@@ -88,7 +88,7 @@ produces. Read-only unless noted.
 | `pressgang_snippets` | `wp capstan snippets` | — |
 | `pressgang_docs_search` `(query, package?, version?)` | the `docs/api-index.json` corpus, version-matched from `composer.lock` | **Documentation Search** |
 | `pressgang_logs` `(url?, limit?)` | `observer.php` template/controller + PHP-issue capture | Error Tracking / Browser Logs |
-| `pressgang_eval` `(php)` — **write, gated** | `wp eval` in theme context | Tinker |
+| `pressgang_sounding` `(php, write?)` — **gated** | `wp eval`, wrapped for structured returns + rollback (see [below](#deferred-design-pressgang_sounding-a-structured-probe-not-a-bare-eval)) | Tinker |
 | `pressgang_make` `(kind, args)` — **write, gated, preview-first** | `wp capstan make …` | Artisan Commands (list/run) |
 
 `pressgang_docs_search` is the tool that turns PressGang's static local-first
@@ -158,10 +158,83 @@ Shipped:
 
 Deferred:
 
-- `pressgang_eval` (arbitrary PHP) — an RCE surface; awaits explicit owner
-  sign-off before it is registered.
+- `pressgang_sounding` (a structured PHP probe superseding a bare
+  `pressgang_eval`) — an RCE surface; specced in the next section, awaits
+  explicit owner sign-off before it is built or registered.
 - The observer-backed `pressgang_logs` source (Shakedown signals).
 - Multi-agent skill targeting (Bosun Phase 2).
+
+## Deferred design: `pressgang_sounding` (a structured probe, not a bare eval)
+
+**Status: proposed, not built.** Needs explicit owner sign-off (it is an RCE
+surface) before implementation.
+
+### Why not just wrap `wp eval`
+
+WordPress already has a Tinker: `wp shell` (interactively, PsySH-backed) and
+`wp eval` (one-shot) run PHP with WordPress loaded. A tool that merely shells to
+`wp eval` adds almost nothing — worse, in a Bash-capable client (Claude Code) the
+agent can already call `wp eval` directly, so the wrapper is *redundant* and
+contributes only RCE surface. A bare `pressgang_eval` is therefore **rejected**.
+
+The tool earns its place only by doing what `wp eval` cannot. Hence a *sounding* —
+in seamanship, dropping a lead line to probe what lies below; "to sound out" is to
+investigate. The name frames the tool as **observation, not execution**, and the
+design follows that framing.
+
+### What it adds over `wp eval`
+
+1. **Returns the value, not just stdout.** `wp eval` shows only what you `echo`.
+   A sounding captures the expression's **return value** and renders it with a
+   typed dumper (PsySH / Symfony VarDumper), so
+   `Quartermaster::posts('event')->toArray()` comes back as structured data with
+   no hand-written `var_export`.
+2. **Captures exceptions and notices.** Instead of a fatal or a raw
+   `Trying to access array offset on null` landing mid-output, the run is trapped
+   and returned as structured fields the agent can reason about.
+3. **PressGang-aware context + a safe-by-default mode.** Pre-wire the idioms
+   (Timber, Quartermaster, resolve a controller's live context by name) so
+   soundings are terse; and — the one guarantee `wp eval` cannot give — wrap the
+   call in a `$wpdb` `START TRANSACTION` / `ROLLBACK` so the **default read mode
+   cannot mutate the database**. Only `write: true` (itself under `--allow-write`)
+   commits.
+
+### Shape
+
+```jsonc
+// tools/call pressgang_sounding
+{
+  "php":   "return Quartermaster::posts('event')->status('publish')->toArray();",
+  "write": false                    // default; true wraps a commit instead of rollback
+}
+// →
+{
+  "result":    "<typed dump of the return value>",
+  "stdout":    "<anything echoed>",
+  "notices":   ["Undefined array key \"x\" in …"],   // captured, not inline
+  "exception": null                                   // or { class, message, file, line }
+}
+```
+
+### Safety posture
+
+- **Two gates, not one.** The tool is registered only under `--allow-write`
+  (server-launch gate); *mutating the database* additionally requires
+  `write: true` per call. Read soundings roll back unconditionally.
+- **Production-guarded.** Inherits `mcp serve`'s refusal to start in a production
+  environment; a sounding never runs against production.
+- **Honest about limits.** The `$wpdb` transaction guards the database only —
+  filesystem writes, external HTTP, and mail are *not* rolled back. The tool
+  description must say so; "read mode" means "DB-safe", not "side-effect-free".
+- **Ownership.** Lives in Capstan alongside the other tools; Bosun still only
+  registers the server, never implements the tool.
+
+### Open questions
+
+- Whether to depend on PsySH/VarDumper for dumping, or ship a minimal formatter.
+- Whether transaction-wrapping is reliable across every storage engine a theme
+  might run on (MyISAM ignores transactions — detect and downgrade to a loud
+  warning rather than a false safety promise).
 
 ## Not chosen
 
