@@ -93,8 +93,8 @@ Malformed or oversized indexes are skipped silently.
   `resources/bosun/skills/{name}/SKILL.md`; Bosun installs detected skills
   to `.claude/skills/` (override via `.ai/skills/{name}`). Ships the
   `pressgang-theme-build` skill — the greenfield build workflow. Next:
-  absorb the b-team migration skills plugin, and target every configured
-  agent (`.cursor/` alongside `.claude/skills/`), not Claude alone.
+  target every configured agent (`.cursor/` alongside `.claude/skills/`),
+  not Claude alone.
 - **Phase 3 (done)** —
   [Capstan](https://github.com/pressgang-wp/pressgang-capstan) shipped its
   introspection commands (`resolve`, `context --add`, `config dump`,
