@@ -46,6 +46,13 @@ wp bosun update                 # recompose (idempotent) — add to composer pos
 
 That's it — all hands briefed.
 
+When [Capstan](https://github.com/pressgang-wp/pressgang-capstan) can serve MCP,
+`install` also registers its server in each editor's MCP config
+(`.mcp.json`, and `.cursor/mcp.json` where Cursor is in use) — owning only its
+own `mcpServers.pressgang` key and preserving every other, so any MCP editor can
+call Capstan's introspection live. `--skip-mcp` opts out. See
+[ADR 0001](docs/adr/0001-mcp-server-layer.md).
+
 Bosun owns a marked region inside each file — everything between
 `<!-- bosun:start -->` and `<!-- bosun:end -->` — never the whole file.
 A hand-written `CLAUDE.md`/`AGENTS.md` keeps every byte of its content

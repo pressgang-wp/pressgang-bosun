@@ -7,6 +7,7 @@ use PressGang\Bosun\Detect\ThemeInventory;
 use PressGang\Bosun\Docs\DocsIndexLocator;
 use PressGang\Bosun\Guidelines\FragmentLocator;
 use PressGang\Bosun\Guidelines\GuidelineComposer;
+use PressGang\Bosun\Mcp\McpRegistrar;
 use PressGang\Bosun\Skills\SkillInstaller;
 
 /**
@@ -26,6 +27,9 @@ use PressGang\Bosun\Skills\SkillInstaller;
  *
  * [--skip-skills]
  * : Compose guidelines only; do not install agent skills.
+ *
+ * [--skip-mcp]
+ * : Do not register the Capstan MCP server in editor configs.
  *
  * ## EXAMPLES
  *
@@ -78,6 +82,20 @@ class InstallCommand {
 
 			if ( $installed ) {
 				\WP_CLI::log( 'Installed skills: ' . implode( ', ', $installed ) );
+			}
+		}
+
+		// Register the Capstan MCP server so any MCP editor can call its
+		// introspection live — only when a Capstan that can serve it is loaded.
+		if ( ! isset( $assoc_args['skip-mcp'] ) && McpRegistrar::capstan_available() ) {
+			$mcp = McpRegistrar::register( $theme_dir, $agents );
+
+			foreach ( $mcp['written'] as $file ) {
+				\WP_CLI::log( "  registered MCP server in {$file}" );
+			}
+
+			foreach ( $mcp['skipped'] as $file ) {
+				\WP_CLI::warning( "skipped {$file} — malformed JSON; fix it and re-run" );
 			}
 		}
 
