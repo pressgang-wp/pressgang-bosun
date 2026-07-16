@@ -93,7 +93,8 @@ Malformed or oversized indexes are skipped silently.
   `resources/bosun/skills/{name}/SKILL.md`; Bosun installs detected skills
   to `.claude/skills/` (override via `.ai/skills/{name}`). Ships the
   `pressgang-theme-build` skill — the greenfield build workflow. Next:
-  absorb the b-team migration skills plugin.
+  absorb the b-team migration skills plugin, and target every configured
+  agent (`.cursor/` alongside `.claude/skills/`), not Claude alone.
 - **Phase 3 (done)** —
   [Capstan](https://github.com/pressgang-wp/pressgang-capstan) shipped its
   introspection commands (`resolve`, `context --add`, `config dump`,
@@ -104,8 +105,14 @@ Malformed or oversized indexes are skipped silently.
   Bosun surfaces each valid index in the composed guidelines so agents
   read signatures from vendor instead of guessing. Next: standardise the
   generator across packages.
-- **Phase 5 (if the tide demands)** — a thin MCP server proxying
-  Capstan/WP-CLI.
+- **Phase 5 (promoted — the missing layer)** — a thin MCP server:
+  Capstan ships `wp capstan mcp serve` (proxying its introspection, plus
+  a version-aware docs search over the api-indexes and a logs tool over
+  Shakedown's observer); Bosun writes the registration into each agent
+  target. This is what brings PressGang to parity-and-beyond with Laravel
+  Boost, and unlocks non-Bash editors (Cursor, Windsurf). It is a wiring
+  job over shipped components — see
+  [ADR 0001](docs/adr/0001-mcp-server-layer.md).
 
 ## 🧪 Testing
 
