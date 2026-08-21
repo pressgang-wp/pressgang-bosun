@@ -34,6 +34,12 @@ Timber 2 + Twig rendering, and config-driven bootstrapping.
   moving such a class does not change the template source, so Timber never
   recompiles: clear the Twig cache on deploy.
 - Twig is presentation only: no queries, no request globals, no business
-  logic. Twig escapes (`|e`), PHP sanitises — never `esc_*` in Twig.
+  logic. Escape in Twig (`|e`), sanitise in PHP — never `esc_*` in Twig.
+- **Timber ships Twig autoescape off**, so `{{ value }}` prints raw HTML and
+  every value a template prints needs escaping by hand: `|e` in text,
+  `|e('html_attr')` in attributes, `|e('wp_kses_post')` where the value is
+  meant to carry markup. Do not read the rule above as "Twig escapes for
+  you". Turning autoescape on globally is not a drop-in fix either — the
+  templates that emit markup on purpose would start escaping it.
 - Inspect and run the site with WP-CLI (`wp eval`, `wp db query`) and
   `wp capstan` commands where available.
