@@ -79,9 +79,20 @@ for the conventions this workflow assumes.
 
 ## Phase 7 — Verify
 
+- If the theme provides `composer check`, run it first. It should be a narrow
+  local-dev alias for `test:compat` plus `phpstan`; keep those as separate CI
+  jobs when failure attribution matters.
+- If `composer check` is missing, run the theme's documented test and static
+  analysis commands separately. Prefer source/PHPDoc/stub/config fixes over
+  PHPStan ignores, and do not add baselines unless explicitly requested.
 - Boot check: `wp eval 'echo "ok";'` (loads the full theme).
 - Route sweep: `curl` each page type; grep for `Fatal error`, `Warning:`,
   `Deprecated:` — all should be absent.
+- Runtime introspection belongs to Capstan/Shakedown: use `wp capstan
+  resolve`, `wp capstan context`, `wp capstan config dump`, and Shakedown's
+  `wp capstan matrix --resolve` oracle rather than inventing new validation.
+- `wp capstan doctor` is runtime-only and should not be treated as a PHPStan
+  replacement.
 - If replacing an existing site, compare rendered output against it
   route-by-route (nav counts, listing counts, dates — including BST/DST
   edge dates for event times).

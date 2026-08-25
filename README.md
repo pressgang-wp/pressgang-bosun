@@ -112,6 +112,10 @@ Malformed or oversized indexes are skipped silently.
   so agents read signatures from vendor instead of guessing. Capstan now ships
   one standard generator (`wp capstan make api-index`, from a per-package
   `api-index.php` manifest); Quartermaster and Muster are on it.
+- **Phase 4.5 (shipped)** — static-analysis guidance: PressGang fragments and
+  the theme-build skill tell agents to run a theme's `composer check` when
+  available, fall back to documented test/PHPStan commands when it is not, and
+  keep PHPStan separate from Capstan/Shakedown runtime checks.
 - **Phase 5 (largely shipped — the missing layer)** — a thin MCP server.
   Capstan ships `wp capstan mcp serve` proxying its introspection, a
   version-aware `pressgang_docs_search` over the api-indexes, and
