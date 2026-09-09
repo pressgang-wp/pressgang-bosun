@@ -44,6 +44,19 @@ code inspection; runtime testing resumes at validation.
    route-by-route; remove legacy dirs and the old ACF plugin copy; then
    `wp bosun update` so guidelines reflect the modern theme.
 
+## Controller naming
+
+Name controllers for the content they present: singular for one post or page
+(`ConferenceController`), plural for a collection/archive (`ConferencesController`).
+Do not append `Single` to a singular controller or copy it from a template filename.
+Choose by the primary view purpose, not only the base class: a PageController can
+back a collection landing page. Taxonomy controllers use the taxonomy subject,
+and special views retain meaningful names such as SearchController or NotFoundController.
+Keep legacy PHP/Twig filenames and stored page-template IDs when renaming a class;
+update imports, render calls, explicit controller maps and class-derived hook users.
+Do not assume a renamed page-template controller will resolve by convention:
+retain its explicit stub/map and verify resolution before removing that mapping.
+
 ## Known traps (each has broken a real migration)
 
 - `new \Timber\PostQuery($args)` with an array **fatals** in Timber 2 —

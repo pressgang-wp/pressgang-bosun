@@ -43,6 +43,13 @@ for the conventions this workflow assumes.
 
 ## Phase 4 — Controllers and traits
 
+Use singular names for single posts/pages (`ConferenceController`) and plural
+names for collections/archives (`ConferencesController`), including collection
+landing pages backed by PageController. Do not add a `Single` prefix or suffix.
+Keep stored template IDs stable; map legacy template names explicitly when
+needed rather than changing content assignments to match a class rename.
+
+
 - One controller per template concern, named for its route:
   plural for archives (`EventsController`), singular for singles
   (`EventController`), subject for taxonomies (`EventTypeController`),
