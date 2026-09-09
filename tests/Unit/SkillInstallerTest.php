@@ -54,6 +54,20 @@ class SkillInstallerTest extends TestCase {
 		$this->assertFileExists( "{$this->theme}/.claude/skills/local-skill/SKILL.md" );
 	}
 
+	public function test_installs_simplifier_with_its_reference(): void {
+		$installer = $this->installer();
+		$skills = $installer->locate( $this->inventory() );
+		$this->assertArrayHasKey( 'pressgang-simplifier', $skills );
+
+		$installer->install( $this->theme, $skills );
+		foreach ( [ 'SKILL.md', 'references/examples.md' ] as $file ) {
+			$this->assertFileEquals(
+				$skills['pressgang-simplifier'] . '/' . $file,
+				$this->theme . '/.claude/skills/pressgang-simplifier/' . $file
+			);
+		}
+	}
+
 	public function test_feature_gated_skill_excluded_without_opt_in(): void {
 		$skills = $this->installer()->locate( $this->inventory() );
 

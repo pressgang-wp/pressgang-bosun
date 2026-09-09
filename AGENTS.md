@@ -59,7 +59,7 @@ WordPress boot required, so the core stays unit-testable with plain PHPUnit.
 - `src/Mcp/McpRegistrar.php` — writes the Capstan MCP server into editor
   configs (`.mcp.json`, `.cursor/mcp.json`), owning only its server key.
 - `resources/guidelines/` — built-in fragments by package slug.
-- `resources/skills/` — built-in skills (theme-build, v1-migration).
+- `resources/skills/` — built-in skills (theme-build, v1-migration, simplifier).
 
 ## Adding a Fragment
 

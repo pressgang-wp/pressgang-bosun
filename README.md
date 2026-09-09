@@ -92,6 +92,23 @@ to WordPress docs). Bosun doesn't copy it anywhere — the composed
 guidelines point agents at the vendor file, the single source of truth.
 Malformed or oversized indexes are skipped silently.
 
+## Simplifying existing themes
+
+Bosun ships `pressgang-simplifier` alongside its build and migration skills.
+After `wp bosun update`, ask your agent:
+
+> Use pressgang-simplifier to simplify the recent controller and trait changes.
+
+It focuses on the current diff unless a wider scope is requested. The skill
+covers readable returns and caching, cohesive traits, parent configuration,
+fluent Quartermaster queries and Timber conversion, with behaviour-sensitive
+verification. Project conventions take precedence over its style preferences.
+It does not authorize dependency upgrades or upstream publication.
+
+Bosun currently installs skills and their references under `.claude/skills/`;
+this addition does not change editor targeting. Theme-local overrides belong in
+`.ai/skills/pressgang-simplifier/`.
+
 ## 🗺️ Roadmap
 
 - **Phase 1 (you are here)** — guidelines composition; move package guidance
