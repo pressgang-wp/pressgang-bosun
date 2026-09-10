@@ -106,3 +106,23 @@ return $this->selected_articles( $selected_ids )
 Keep this if an empty selection would otherwise remove the constraint and fetch
 unrelated posts. One return is a readability preference, not a reason to alter
 empty-query behaviour or bury a multi-step query inside a ternary.
+
+## Presentation fields and pagination
+
+A getter that only returns `$this->get_post()->meta( 'intro_title' )` can become
+`{{ post.meta('intro_title')|e }}` in its consuming view. Preserve the existing
+escaping contract for rich text. Repeated values can use a local Twig variable.
+Check inherited blocks, includes and macro arguments before deleting the alias.
+
+A custom page listing can pass pagination from the collection already displayed:
+
+```twig
+{% include 'partials/modules/pagination.twig' with {
+    pagination: news_items.pagination()
+} %}
+```
+
+The partial still receives `pagination`; the controller no longer needs a getter
+only to expose it. Remove the query cache only if no other PHP getter or execution
+path needs the same result. Ordinary PostsController archives can keep inherited
+pagination. Relationship mapping and query construction remain in PHP.
