@@ -22,12 +22,25 @@ to whole controllers, traits or the codebase only when requested. Preserve user
 changes. Identify the contracts touched: context keys, return shapes, caching,
 query results and order, pagination, route status, template selection and hooks.
 
+## Check whether the work is needed
+
+Trace context consumers before polishing producers: inherited templates, block
+bodies, includes and embeds, macro call arguments, dynamic context access, and
+PHP hooks. Block names are not variable reads; block bodies receive context.
+Macros have local scope, but their arguments may use controller context. A text
+search alone cannot prove a dynamically accessed key is unused. Remove proven
+unused getters and their now-unreachable queries/helpers together.
+
 ## Prefer these simplifications
 
 - Use one return when it reads clearly. Remove a cache guard when the following
   `??=` already provides the same lazy evaluation. Keep guards that prevent
   unsafe work or avoid nesting a substantial branch. Do not force one return
   with a result variable, nested ternaries or a larger method.
+- Do not add a cache to every getter. A manifest invokes each entry once per
+  application; inspect cross-getter calls and repeated rendering before removing
+  caches. Retain caching for reused queries or expensive enrichment. A one-use
+  getter/resolver pair can usually be one method.
 - Choose short names that describe the result. Remove arguments already supplied
   by an existing object when every caller intends the same meaning. Preserve
   public APIs and template/getter conventions when renaming.
@@ -52,7 +65,8 @@ query results and order, pagination, route status, template selection and hooks.
 
 Use fluent Quartermaster methods for supported query operations. Keep queries
 visually linear; name intermediate values when nested preparation obscures the
-query. Traits can return builders and controllers choose the terminal. Do not
+query. Traits can return builders when callers refine the query. Shared selection or
+enrichment helpers may return finished results when that is their useful contract. Do not
 replace consumption of WordPress's existing main query with a second query.
 
 Use standard query-var bindings when they state intent more clearly than manual
@@ -70,6 +84,19 @@ versus nested OR, relationship ID representation, metadata types, ordering
 filters, pagination and missing metadata can change results. Preserve the
 terminal's shape: an empty collection object and an empty array behave
 differently in Twig. `all()` and a negative limit need not produce identical args.
+
+Read presentation-only fields from the existing model in Twig with `post.meta()`
+or `term.meta()`; use a local Twig variable for repeated expressions. Do not
+create controller getters just to forward fields. Keep queries, selection rules,
+relationship normalization and enrichment in PHP. Preserve output escaping and
+field ownership; an ambient `get_field()` read is not automatically equivalent.
+
+For custom listings, pass `items.pagination()` explicitly to the pagination
+partial when that removes controller plumbing. Use the displayed collection,
+never a second query. Retain inherited archive pagination where it already fits.
+Timber PostQuery caches its pagination object; do not duplicate that cache.
+Remove unused pagination for unpaged listings. Keep collection caches needed by
+other PHP getters, even when pagination moves to Twig.
 
 Use Timber factories and registered class maps to construct models; PHP casts
 cannot convert WordPress objects to Timber models. Keep normalization helpers
