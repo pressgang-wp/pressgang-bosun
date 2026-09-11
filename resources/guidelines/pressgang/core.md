@@ -34,6 +34,34 @@ Timber 2 + Twig rendering, and config-driven bootstrapping.
   moving such a class does not change the template source, so Timber never
   recompiles: clear the Twig cache on deploy.
 - Twig is presentation only: no queries, no request globals, no business
-  logic. Twig escapes (`|e`), PHP sanitises — never `esc_*` in Twig.
+  logic. Escape in Twig (`|e`), sanitise in PHP — never `esc_*` in Twig.
+- **Timber ships Twig autoescape off**, so `{{ value }}` prints raw HTML and
+  every value a template prints needs escaping by hand: `|e` in text,
+  `|e('html_attr')` in attributes, `|e('wp_kses_post')` where the value is
+  meant to carry markup. Do not read the rule above as "Twig escapes for
+  you". Turning autoescape on globally is not a drop-in fix either — the
+  templates that emit markup on purpose would start escaping it.
 - Inspect and run the site with WP-CLI (`wp eval`, `wp db query`) and
   `wp capstan` commands where available.
+
+### Verify static PHP changes with Composer
+
+When the theme provides `composer check`, run it before handoff. It is a
+local-dev convenience alias for exactly `test:compat` plus `phpstan`; CI may
+keep those as separate jobs for clearer failure attribution.
+
+If `composer check` is missing, run the theme's documented test and static
+analysis commands separately. Prefer fixing source, PHPDoc, project stubs, or
+configuration shape over adding PHPStan ignores. Do not add baselines unless a
+maintainer explicitly asks.
+
+### Verify runtime shape with Capstan
+
+Do not invent route/controller/context/config validation. Use `wp capstan
+resolve`, `wp capstan context`, `wp capstan config dump`, and Shakedown's
+`wp capstan matrix --resolve` oracle. `wp capstan doctor` is runtime-only and
+must not be treated as a PHPStan replacement.
+
+A future `wp capstan check` would only orchestrate the theme's existing
+`composer check` plus `doctor`; it should not be built until real child-theme
+adoption exists.
