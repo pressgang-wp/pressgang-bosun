@@ -107,6 +107,29 @@ Keep this if an empty selection would otherwise remove the constraint and fetch
 unrelated posts. One return is a readability preference, not a reason to alter
 empty-query behaviour or bury a multi-step query inside a ternary.
 
+## Let a shared trait own the getter
+
+When several controllers expose the same context key with the same query, the
+trait can provide the convention getter directly:
+
+```php
+trait HasResearchThemes {
+    protected function get_research_themes(): array {
+        return $this->taxonomy_terms( 'research-theme', true );
+    }
+}
+```
+
+Do not consolidate getters whose query flags differ. `hide_empty: true` and
+`hide_empty: false` are different contracts, even when the current database
+happens to produce the same terms. WordPress also calculates `hide_empty` across
+the taxonomy's registered object types, so it cannot guarantee that a term has
+results for one listing post type.
+
+Keep a substantive getter in its controller when it has one consumer. Moving it
+to a single-use trait shortens the controller without creating useful reuse and
+makes the view's defining query harder to find.
+
 ## Presentation fields and pagination
 
 A getter that only returns `$this->get_post()->meta( 'intro_title' )` can become

@@ -50,7 +50,11 @@ unused getters and their now-unreachable queries/helpers together.
 - Keep controllers focused on view composition. Move cohesive, reusable domain
   queries or behaviour to traits when this makes their callers clearer. A small
   method that loads, selects and combines one result can still have one
-  responsibility. Avoid helpers that merely rename a line or pass arguments on.
+  responsibility. A shared trait may expose the convention getter directly when
+  multiple controllers need the same context key and query semantics. Keep a
+  one-off view query in its controller; do not create a single-use trait merely
+  to shorten the class. Avoid helpers that merely rename a line or pass arguments
+  on. Check composed traits for method and property collisions.
 - Replace constructor-only controllers with parent-controller/template config
   only when the installed parent supplies equivalent behaviour. Check context,
   hooks, template precedence and 404 handling, not just the template filename.
@@ -84,6 +88,9 @@ versus nested OR, relationship ID representation, metadata types, ordering
 filters, pagination and missing metadata can change results. Preserve the
 terminal's shape: an empty collection object and an empty array behave
 differently in Twig. `all()` and a negative limit need not produce identical args.
+WordPress `hide_empty` uses a taxonomy term's aggregate count; it does not prove
+that the term has results for a listing's particular post type. Do not use it as
+a post-type-specific filter-validity check.
 
 Read presentation-only fields from the existing model in Twig with `post.meta()`
 or `term.meta()`; use a local Twig variable for repeated expressions. Do not
