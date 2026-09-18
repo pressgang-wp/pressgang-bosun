@@ -42,6 +42,9 @@ WordPress boot required, so the core stays unit-testable with plain PHPUnit.
   copied: the vendor file is the single source of truth. Skip invalid or
   oversized indexes silently — an index is an enhancement, never a
   requirement.
+- Static-analysis guidance belongs in fragments/skills, not Bosun runtime:
+  tell agents to use a theme's `composer check`/`composer phpstan`, but do not
+  make Bosun execute or configure PHPStan.
 - MCP registration is the JSON analogue of the marked region: bosun owns only
   its own `mcpServers.pressgang` key in each editor config and preserves every
   other, gated on a Capstan that can serve MCP, never clobbering malformed
