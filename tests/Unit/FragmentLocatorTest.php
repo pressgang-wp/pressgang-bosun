@@ -72,6 +72,18 @@ class FragmentLocatorTest extends TestCase {
 		$this->assertStringContainsString( 'vendor/pressgang-wp/pressgang', $fragments['pressgang/template-routing.md'] );
 	}
 
+	public function test_acf_values_fragment_requires_transformation_opt_in(): void {
+		// The fixture vendor ships pressgang/acf-values.md, gated on the
+		// transform_acf_values opt-in detected from config/timber.php.
+		$locator = new FragmentLocator( dirname( __DIR__, 2 ) . '/resources/guidelines' );
+
+		$default = new ThemeInventory( __DIR__ . '/../fixtures/theme', [ 'pressgang-wp/pressgang' => 'dev-master' ], [], [] );
+		$this->assertArrayNotHasKey( 'pressgang/acf-values.md', $locator->locate( $default ) );
+
+		$opted = new ThemeInventory( __DIR__ . '/../fixtures/theme', [ 'pressgang-wp/pressgang' => 'dev-master' ], [], [ 'acf-values' ] );
+		$this->assertStringContainsString( 'vendor/pressgang-wp/pressgang', $locator->locate( $opted )['pressgang/acf-values.md'] );
+	}
+
 	public function test_feature_gated_fragments_excluded_without_opt_in(): void {
 		$inventory = new ThemeInventory( __DIR__ . '/../fixtures/theme', [ 'pressgang-wp/pressgang' => 'dev-master' ], [], [] );
 		$locator   = new FragmentLocator( dirname( __DIR__, 2 ) . '/resources/guidelines' );

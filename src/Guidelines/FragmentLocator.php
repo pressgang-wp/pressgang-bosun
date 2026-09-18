@@ -94,7 +94,7 @@ class FragmentLocator {
 
 		$feature = basename( $relative, '.md' );
 
-		if ( in_array( $feature, [ 'template-routing', 'page-templates', 'routes' ], true ) ) {
+		if ( in_array( $feature, [ 'template-routing', 'page-templates', 'routes', 'acf-values' ], true ) ) {
 			return $inventory->has_feature( $feature );
 		}
 
