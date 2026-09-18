@@ -86,6 +86,11 @@ normalization. Inspect the mapper and factory before replacing it. In some
 Timber versions `get_posts([])` means the current query, not an empty selection.
 Native factories should still choose the mapped post classes.
 
+When the theme opts into `transform_acf_values` (composed guidance lists the
+`acf-values` feature), `meta()` already returns Timber collections and
+`to_timber_posts()` returns an empty array for them. Read stored IDs with
+`raw_meta()` there instead, and follow the composed ACF values guidance.
+
 A method that keeps editorial selections and adds fallback items has one
 cohesive responsibility. Name the remaining count, avoid querying when no slots
 remain, and preserve editorial order and duplicates policy. A target of three

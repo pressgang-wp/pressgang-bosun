@@ -155,6 +155,13 @@ class ThemeInventory {
 			$features[] = 'routes';
 		}
 
+		// Timber's ACF value transformation, opted into via config/timber.php.
+		$timber = "{$theme_dir}/config/timber.php";
+
+		if ( is_readable( $timber ) && preg_match( '/[\'"]transform_acf_values[\'"]\s*=>\s*true\b/i', self::executable_code( $timber ) ) ) {
+			$features[] = 'acf-values';
+		}
+
 		// A PressGang v1 boot file marks a theme awaiting migration.
 		if ( is_readable( "{$theme_dir}/core/settings.php" ) ) {
 			$features[] = 'legacy-v1';

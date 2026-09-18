@@ -28,6 +28,18 @@ class ThemeInventoryTest extends TestCase {
 		$this->assertFalse( $inventory->has_feature( 'routes' ) );
 	}
 
+	public function test_detects_acf_value_transformation_opt_in(): void {
+		$inventory = ThemeInventory::from_theme( $this->fixture_theme() );
+
+		$this->assertTrue( $inventory->has_feature( 'acf-values' ) );
+	}
+
+	public function test_commented_out_or_disabled_acf_transformation_is_not_detected(): void {
+		$inventory = ThemeInventory::from_theme( __DIR__ . '/../fixtures/commented' );
+
+		$this->assertFalse( $inventory->has_feature( 'acf-values' ) );
+	}
+
 	public function test_commented_out_provider_is_not_detected(): void {
 		$inventory = ThemeInventory::from_theme( __DIR__ . '/../fixtures/commented' );
 
