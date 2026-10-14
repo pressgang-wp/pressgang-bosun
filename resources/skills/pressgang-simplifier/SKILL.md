@@ -73,6 +73,13 @@ query. Traits can return builders when callers refine the query. Shared selectio
 enrichment helpers may return finished results when that is their useful contract. Do not
 replace consumption of WordPress's existing main query with a second query.
 
+Prefer Quartermaster terminals (`timber()`, `get()`, `first()`) when they provide
+what the caller consumes. Use `wpQuery()` only when the query object itself is
+needed. Retain an external execution call around `toArgs()` only for a concrete
+behaviour difference verified against the installed implementation, such as
+WordPress `get_posts()` defaults. Returning args to a filter is also a valid use
+of `toArgs()`. Do not preserve wrappers merely because they existed before.
+
 Use standard query-var bindings when they state intent more clearly than manual
 reads. Do not replace a readable local variable with a custom callback containing
 sanitization, decoding and query logic. Use named methods for meaningful domain
